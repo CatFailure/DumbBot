@@ -10,9 +10,6 @@ import WarframeBotMenu as wfMenu
 import datetime as dt
 import math
 
-# Bot token
-TOKEN = os.environ["TOKEN"]
-
 # Define a prefix
 BOT_Prefix = "=wf "
 
@@ -225,4 +222,4 @@ async def list_servers():
 
 
 client.loop.create_task(list_servers())
-client.run(TOKEN)
+client.run(os.environ["TOKEN"])
