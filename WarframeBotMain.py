@@ -1,6 +1,7 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 from datetime import datetime
 
+import os
 import discord
 from discord.ext.commands import Bot
 import asyncio
@@ -10,7 +11,7 @@ import datetime as dt
 import math
 
 # Bot token
-TOKEN = input("Please enter bot token: ")
+TOKEN = os.environ["TOKEN"]
 
 # Define a prefix
 BOT_Prefix = "=wf "
