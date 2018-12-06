@@ -202,10 +202,11 @@ async def on_ready():
                   "Shots fired,", "you’re fired", "You’re washed up,", "you’re retired",
                   "Your kitty looks like", "a flat tire", "I bet that your", "kitty real tired", "Perfect!"
                   ]
-    while not client.is_closed:
-        for trashLyric in lHitOrMiss:
-            await client.change_presence(game=discord.Game(name=trashLyric, type=1))  # Set game playing
-            await asyncio.sleep(5)
+    # while not client.is_closed:
+    #     for trashLyric in lHitOrMiss:
+    #         await client.change_presence(game=discord.Game(name=trashLyric, type=1))  # Set game playing
+    #         await asyncio.sleep(5)
+    await client.change_presence(game=discord.Game(name="We server-based now!", type=1))  # Set game playing
 
 
 # Define a function to print the current servers
