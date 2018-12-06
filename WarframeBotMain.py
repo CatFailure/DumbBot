@@ -40,7 +40,7 @@ async def invite_bot(context):
         title="Invite BotFrame!",
         colour=discord.Colour.magenta()
     )
-    inviteEmbed.add_field(name="http://bit.ly/inviteDumbBot",
+    inviteEmbed.add_field(name=os.getenv("INVITEBOTLINK"),
                           value='Invite DumbBot to your server with this link!',
                           inline=False)
     inviteEmbed.set_thumbnail(url='https://bit.ly/2RlTq6p')  # Display server logo ;)
