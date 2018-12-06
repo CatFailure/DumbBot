@@ -222,4 +222,4 @@ async def list_servers():
 
 
 client.loop.create_task(list_servers())
-client.run(os.environ["TOKEN"])
+client.run(os.genenv("TOKEN"))
