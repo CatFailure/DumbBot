@@ -167,10 +167,11 @@ async def relic_list(context, *option):
                     relicTier = option[0].lower().capitalize()
                     relicName = option[1].capitalize()
                     relicDropsEmbed = wfMenu.retrieveDropsInOrder(relicTier, relicName)
-                    await client.send_message(context.message.channel, embed=relicDropsEmbed)
-                    # if len() == 0:
-                    #     errorEmbed = wfMenu.errorMessage()
-                    #     await client.send_message(context.message.channel, embed=errorEmbed)
+                    if len(relicDropsEmbed) != 0:
+                      await client.send_message(context.message.channel, embed=relicDropsEmbed)
+                    else:
+                      errorEmbed = wfMenu.errorMessage()
+                      await client.send_message(context.message.channel, embed=errorEmbed)
             else: # Forma searched
                 formaEmbed = discord.Embed(
                     title="Forma",
