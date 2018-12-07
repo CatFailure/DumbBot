@@ -170,11 +170,11 @@ def genPrimeDetEmbed(primeDetailList):
         primeDetailsEmbed.add_field(name=primeDetail[1], value=sRelicInfo)
         primeDetailsEmbed.set_thumbnail(url=lRelicInfo[relicInfoPointer][5])
     if wfDatabase.checkIfVaulted(primeDetailList[0][0]) != 1:
-        primeDetailsEmbed.set_footer(text="This Warframe's relics can be farmed and is not vaulted!\
-         (Note: Some relics maybe vaulted however)")
+        primeDetailsEmbed.set_footer(text="This Warframe's relics can be farmed and is not vaulted! \
+    (Note: Some relics maybe vaulted however)")
     else:
-        primeDetailsEmbed.set_footer(text="WARNING: This Warframe is in the Prime Vault and therefore, it's relics\
-         CANNOT be farmed outside of trading!")
+        primeDetailsEmbed.set_footer(text="WARNING: This Warframe is in the Prime Vault and therefore, it's relics \
+    CANNOT be farmed outside of trading!")
     return primeDetailsEmbed
 
 
