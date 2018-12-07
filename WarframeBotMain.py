@@ -192,7 +192,7 @@ async def on_ready():
     # Create the database and tables
     wfDatabase.create_Database()
     wfDatabase.createTables()
-    lHitOrMiss = ["Hit or miss, I guess", "they never miss, huh?", "You got a boyfriend,",
+    #lHitOrMiss = ["Hit or miss, I guess", "they never miss, huh?", "You got a boyfriend,",
                   "I bet he doesn't kiss ya", "He gon' find another girl", "and he won't miss ya",
                   "He gon' skrrt and", "hit the dab like Wiz Khalifa", "You play with them balls",
                   "like it’s FIFA", "You won every level,", "you’re the leader, ooh", "You used to work",
@@ -200,11 +200,11 @@ async def on_ready():
                   "Shots fired,", "you’re fired", "You’re washed up,", "you’re retired",
                   "Your kitty looks like", "a flat tire", "I bet that your", "kitty real tired", "Perfect!"
                   ]
-    while not client.is_closed:
-        for trashLyric in lHitOrMiss:
-            await client.change_presence(game=discord.Game(name=trashLyric, type=1))  # Set game playing
-            await asyncio.sleep(5)
-    #await client.change_presence(game=discord.Game(name="We server-based now!", type=1))  # Set game playing
+    #while not client.is_closed:
+        #for trashLyric in lHitOrMiss:
+            #await client.change_presence(game=discord.Game(name=trashLyric, type=1))  # Set game playing
+            #await asyncio.sleep(5)
+    await client.change_presence(game=discord.Game(name="as Tracer", type=1))  # Set game playing
 
 
 # Define a function to print the current servers
