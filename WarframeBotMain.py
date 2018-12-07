@@ -31,7 +31,7 @@ client = Bot(command_prefix=BOT_Prefix)
 
 # Create the command decorator
 # INVITE COMMAND
-@client.command(aliases=['invite'],
+@client.command(aliases.lower()=['invite'],
                 description="Invite this bot to your server!",
                 brief="Invite this bot to your server!",
                 pass_context=True)
@@ -48,7 +48,7 @@ async def invite_bot(context):
 
 
 # Create the command decorator
-@client.command(aliases=['info', 'i', 'information'],
+@client.command(aliases.lower()=['info', 'i', 'information'],
                 description="Find information about a Warframe",
                 brief="Find information about a Warframe",
                 pass_context=True)
@@ -134,7 +134,7 @@ async def warframe_list(context, *option):
 
 
 # Create the command decorator
-@client.command(aliases=['relics', 'r'],
+@client.command(aliases.lower()=['relics', 'r'],
                 description="Find information about Relics",
                 brief="Find information about Relics",
                 pass_context=True)
