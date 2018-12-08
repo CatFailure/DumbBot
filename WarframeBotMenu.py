@@ -1,4 +1,6 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+from typing import Any
+
 import discord
 from discord import Embed
 from discord.ext.commands import Bot
@@ -7,6 +9,11 @@ import asyncio
 import WarframeDatabase as wfDatabase
 import time
 import random
+
+# Website scraping
+from bs4 import BeautifulSoup
+import requests
+import re
 
 
 # Display all warframes 10 at once
@@ -126,6 +133,7 @@ def genPreview(lWarframeInfo, prime):
     previewEmbed.set_thumbnail(url=lWarframeInfo[3])  # Display Warframe chosen
     return previewEmbed  # Pass back to main file
 
+
 def genRelicCatEmbed():
     urlLithRelic = "http://bit.ly/LRelic"
     urlMesoRelic = "http://bit.ly/MRelic"
@@ -133,9 +141,9 @@ def genRelicCatEmbed():
     urlAxiRelic = "http://bit.ly/ARelic"
     relicCategoriesEmbed: Embed = discord.Embed(
         title='Void Relic Categories',
-        color= discord.Colour.gold()
+        color=discord.Colour.gold()
     )
-    relicCategoriesEmbed.add_field(name='Lith',value='** **')
+    relicCategoriesEmbed.add_field(name='Lith', value='** **')
     relicCategoriesEmbed.add_field(name='Meso', value='** **')
     relicCategoriesEmbed.add_field(name='Neo', value='** **')
     relicCategoriesEmbed.add_field(name='Axi', value='** **')
@@ -161,18 +169,20 @@ def genPrimeDetEmbed(primeDetailList):
     for primeDetail in primeDetailList:
         lRelicInfo = wfDatabase.getRelicByPart(primeDetail[0], primeDetail[1])
         sRelicInfo = ""
-        intLengthOfRelicInfo = len(lRelicInfo)-1
+        intLengthOfRelicInfo = len(lRelicInfo) - 1
         for relicInfoPointer in range(len(lRelicInfo)):
             sRelicInfo += lRelicInfo[relicInfoPointer][1] + " " + lRelicInfo[relicInfoPointer][2] + " (" \
-                         + lRelicInfo[relicInfoPointer][3] + ")"
+                          + lRelicInfo[relicInfoPointer][3] + ")"
             if relicInfoPointer != intLengthOfRelicInfo:
                 sRelicInfo += " | "
         primeDetailsEmbed.add_field(name=primeDetail[1], value=sRelicInfo)
         primeDetailsEmbed.set_thumbnail(url=lRelicInfo[relicInfoPointer][5])
     if wfDatabase.checkIfVaulted(primeDetailList[0][0]) != 1:
-        primeDetailsEmbed.set_footer(text="This Warframe's relics can be farmed and is not vaulted! (Note: Some relics maybe vaulted however)")
+        primeDetailsEmbed.set_footer(text="This Warframe's relics can be farmed and is not vaulted! \
+        (Note: Some relics maybe vaulted however)")
     else:
-        primeDetailsEmbed.set_footer(text="WARNING: This Warframe is in the Prime Vault and therefore, it's relics can't be farmed outside of trading!")
+        primeDetailsEmbed.set_footer(text="WARNING: This Warframe is in the Prime Vault and therefore, it's relics \
+        CANNOT be farmed outside of trading!")
     return primeDetailsEmbed
 
 
@@ -223,14 +233,50 @@ def retrieveDropsInOrder(tier, name):
     return relicDropEmbed
 
 
-
-
-
 def genRelicDetEmbed(relicTier, relicName, relicDetailList):
     relicDetailsEmbed = discord.Embed(
         title=(relicTier + " " + relicName),
         color=discord.Colour.gold()
     )
+
+
+def getHotfixes():
+    def genHotFixEmbed(lPatchNotes: object) -> object:
+        hotfixEmbed = discord.Embed(title='Warframe Patch Notes',
+                                    color=discord.Colour.dark_orange()
+                                    )
+        for patch in lPatchNotes:
+            hotfixEmbed.add_field(name=patch[0],
+                                  value=patch[1],
+                                  inline=False)
+        hotfixEmbed.set_footer(
+            text='All patch notes can be found here: https://forums.warframe.com/forum/3-pc-update-notes/'
+        )
+        hotfixEmbed.set_thumbnail(url='http://bit.ly/WarframeLogo')
+        return hotfixEmbed  # Pass back embed
+
+    # Initialise lists
+    lPatchNoteLinks = []
+    lPatchNoteNames = []
+    lCombinedPatch = []
+
+    site_request = requests.get("https://forums.warframe.com/forum/3-pc-update-notes/")  # Scrape warframe forums
+    soup = BeautifulSoup(site_request.content, "html.parser")  # Set parser
+    patchLinks = soup.find_all(attrs={'href': re.compile("https://forums.warframe.com/topic/")},
+                               class_=False)
+    for link in patchLinks:
+        if "?page=1 " in (link.get('href') + " "):  # Remove any links past page 1
+            lPatchNoteLinks.append(link.get('href'))
+
+    patchNames = soup.find_all(attrs={'title': re.compile(": Update|: Hotfix")})  # Retrieve patch names
+    for name in patchNames:
+        lPatchNoteNames.append(name.get('title'))
+
+    for indexPointer in range(7):  # Only 7 patch notes please for the love of god don't fill my screen
+        patchTuple: tuple[Any] = tuple((lPatchNoteNames[indexPointer], lPatchNoteLinks[indexPointer]))  # Store combined
+        lCombinedPatch.append(patchTuple)
+
+    return genHotFixEmbed(lCombinedPatch)  # Passback embed to main file
 
 
 # DEFAULT ERROR MESSAGE
