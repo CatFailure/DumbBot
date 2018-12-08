@@ -1,20 +1,16 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
-from datetime import datetime
-
-import os
 import discord
 from discord.ext.commands import Bot
 import asyncio
 import WarframeDatabase as wfDatabase
 import WarframeBotMenu as wfMenu
-import datetime as dt
-import math
 
 # Define a prefix
-BOT_Prefix = "=wf "
+BOT_Prefix = "="
 
 client = Bot(command_prefix=BOT_Prefix)
 
+client.remove_command("help")
 
 # # Create the command decorator
 # @client.command(aliases=['t', 'test'],
@@ -31,7 +27,7 @@ client = Bot(command_prefix=BOT_Prefix)
 
 # Create the command decorator
 # INVITE COMMAND
-@client.command(aliases=['invite'],
+@client.command(aliases=['invite', 'i', 'inv'],
                 description="Invite this bot to your server!",
                 brief="Invite this bot to your server!",
                 pass_context=True)
@@ -40,7 +36,7 @@ async def invite_bot(context):
         title="Invite BotFrame!",
         colour=discord.Colour.magenta()
     )
-    inviteEmbed.add_field(name=os.getenv("INVITEBOTLINK"),
+    inviteEmbed.add_field(name="http://bit.ly/inviteDumbBot",
                           value='Invite DumbBot to your server with this link!',
                           inline=False)
     inviteEmbed.set_thumbnail(url='https://bit.ly/2RlTq6p')  # Display server logo ;)
@@ -48,7 +44,7 @@ async def invite_bot(context):
 
 
 # Create the command decorator
-@client.command(aliases=['info', 'i', 'information'],
+@client.command(aliases=['info', 'in', 'information'],
                 description="Find information about a Warframe",
                 brief="Find information about a Warframe",
                 pass_context=True)
@@ -134,9 +130,10 @@ async def warframe_list(context, *option):
 
 
 # Create the command decorator
-@client.command(aliases=['relics', 'r'],
-                description="Find information about Relics",
-                brief="Find information about Relics",
+@client.command(name='Prime/Relic drops',
+                aliases=['s', 'search'],
+                description="Find information about Primes/Relics",
+                brief="Find information about Primes/Relics",
                 pass_context=True)
 async def relic_list(context, *option):
     if len(option) == 0:
@@ -152,13 +149,13 @@ async def relic_list(context, *option):
             relicInfoEmbed.add_field(name='All Void Relic information can be found here',
                                      value='https://warframe.fandom.com/wiki/Void_Relic',
                                      inline=False)
-            relicInfoEmbed.set_thumbnail(url='https://bit.ly/2RlTq6p')
+            relicInfoEmbed.set_thumbnail(url='https://bit.ly/2RlTq6p')  # Server logo
             await client.send_message(context.message.channel, embed=relicInfoEmbed)
         else:
             searchQuery = ''
             for i in option:
                 searchQuery = searchQuery + " " + i.lower().capitalize()
-            if searchQuery.strip() != "Forma": # Search database for prime item
+            if searchQuery.strip() != "Forma":  # Search database for prime item
                 primeDetails: object = wfDatabase.searchItem(searchQuery.strip())
                 if len(primeDetails) != 0:
                     primeDetailsEmbed = wfMenu.genPrimeDetEmbed(primeDetails)
@@ -167,20 +164,30 @@ async def relic_list(context, *option):
                     relicTier = option[0].lower().capitalize()
                     relicName = option[1].capitalize()
                     relicDropsEmbed = wfMenu.retrieveDropsInOrder(relicTier, relicName)
-                    if len(relicDropsEmbed) != 0:
-                      await client.send_message(context.message.channel, embed=relicDropsEmbed)
-                    else:
-                      errorEmbed = wfMenu.errorMessage()
-                      await client.send_message(context.message.channel, embed=errorEmbed)
-            else: # Forma searched
+                    await client.send_message(context.message.channel, embed=relicDropsEmbed)
+                    # if len() == 0:
+                    #     errorEmbed = wfMenu.errorMessage()
+                    #     await client.send_message(context.message.channel, embed=errorEmbed)
+            else:  # Forma searched
                 formaEmbed = discord.Embed(
                     title="Forma",
                     url="https://warframe.fandom.com/wiki/Forma",
                     color=discord.Colour.gold()
                 )
-                formaEmbed.add_field(name="All forma drop locations (100+) can be found here:", value="https://warframe.fandom.com/wiki/Forma")
+                formaEmbed.add_field(name="All forma drop locations (100+) can be found here:",
+                                     value="https://warframe.fandom.com/wiki/Forma")
                 formaEmbed.set_thumbnail(url="http://bit.ly/FormaPicture")
-                await client.send_message(context.message.channel,embed=formaEmbed)
+                await client.send_message(context.message.channel, embed=formaEmbed)
+
+
+# Create the command decorator
+@client.command(aliases=['pn'],
+                description="Displays recent patch notes",
+                brief="Displays recent patch notes",
+                pass_context=True)
+async def patchnotes(context):
+    patchEmbed = wfMenu.getHotfixes()
+    await client.send_message(context.message.channel, embed=patchEmbed)
 
 
 # Ran every time the bot is activated
@@ -193,6 +200,7 @@ async def on_ready():
     # Create the database and tables
     wfDatabase.create_Database()
     wfDatabase.createTables()
+    wfMenu.getHotfixes()
     # lHitOrMiss = ["Hit or miss, I guess", "they never miss, huh?", "You got a boyfriend,",
     #               "I bet he doesn't kiss ya", "He gon' find another girl", "and he won't miss ya",
     #               "He gon' skrrt and", "hit the dab like Wiz Khalifa", "You play with them balls",
@@ -221,6 +229,11 @@ async def list_servers():
         # Don't say it again for 1000 minutes for the love of god
         await asyncio.sleep(60000)
 
+
+@client.event  # MAKE COMMANDS CASE INSENSITIVE
+async def on_message(message):
+    message.content = message.content.lower()
+    await client.process_commands(message)
 
 client.loop.create_task(list_servers())
 client.run(os.getenv("TOKEN"))
