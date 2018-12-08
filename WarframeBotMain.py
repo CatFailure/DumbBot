@@ -4,6 +4,7 @@ from discord.ext.commands import Bot
 import asyncio
 import WarframeDatabase as wfDatabase
 import WarframeBotMenu as wfMenu
+import os
 
 # Define a prefix
 BOT_Prefix = "="
