@@ -113,8 +113,7 @@ def checkIfVaulted(item):
     cVauledCheck = conn.execute("SELECT DISTINCT vaulted_ FROM Prime_relics \
                                              WHERE item_ = ?", (item,))
     lVaultedCheck = list(cVauledCheck)
-    print(len(lVaultedCheck))
-    return len(lVaultedCheck)
+    return lVaultedCheck
 
 def insertBlank():
     conn = sqlite3.connect('dbWarframe.db')
