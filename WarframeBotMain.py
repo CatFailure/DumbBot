@@ -28,7 +28,8 @@ client.remove_command("help")
 
 # Create the command decorator
 # INVITE COMMAND
-@client.command(aliases=['invite', 'i', 'inv'],
+@client.command(name='Invite to server',
+                aliases=['invite', 'inv'],
                 description="Invite this bot to your server!",
                 brief="Invite this bot to your server!",
                 pass_context=True)
@@ -45,7 +46,8 @@ async def invite_bot(context):
 
 
 # Create the command decorator
-@client.command(aliases=['info', 'in', 'information'],
+@client.command(name='Item Information',
+                aliases=['info', 'i', 'information'],
                 description="Find information about a Warframe",
                 brief="Find information about a Warframe",
                 pass_context=True)
@@ -132,7 +134,7 @@ async def warframe_list(context, *option):
 
 # Create the command decorator
 @client.command(name='Prime/Relic drops',
-                aliases=['s', 'search'],
+                aliases=['r', 'rel', 'relic'],
                 description="Find information about Primes/Relics",
                 brief="Find information about Primes/Relics",
                 pass_context=True)
@@ -182,7 +184,8 @@ async def relic_list(context, *option):
 
 
 # Create the command decorator
-@client.command(aliases=['pn'],
+@client.command(name='Patch Notes',
+                aliases=['pn','patchnotes', 'patch', 'notes'],
                 description="Displays recent patch notes",
                 brief="Displays recent patch notes",
                 pass_context=True)
