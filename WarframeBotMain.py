@@ -3,8 +3,13 @@ import discord
 from discord.ext.commands import Bot
 import asyncio
 import WarframeDatabase as wfDatabase
-import WarframeBotMenu as wfMenu
-import os
+import querying_warframes as query_wf
+import querying_relics as query_relic
+import querying_html as query_html
+import querying_weapons as query_weap
+
+# Bot token
+TOKEN = "NDc2MTMwMzc2ODQzMTMyOTQ5.Dus8Gg.NWW1YN279fFIbfk__TT6UOxHzEM"
 
 # Define a prefix
 BOT_Prefix = "="
@@ -12,6 +17,18 @@ BOT_Prefix = "="
 client = Bot(command_prefix=BOT_Prefix)
 
 client.remove_command("help")
+
+
+# DEFAULT ERROR MESSAGE
+def errorMessage():
+    errorEmbed = discord.Embed(title="ERROR!",
+                               color=discord.Colour.red()
+                               )
+    errorEmbed.add_field(name="Invalid query!",
+                         value="Item queried does not exist! Check spelling and command usage and try again!",
+                         inline=False)
+    errorEmbed.set_thumbnail(url='https://i.redd.it/752n4wf5i6f11.png')
+    return errorEmbed  # Pass back to main file
 
 # # Create the command decorator
 # @client.command(aliases=['t', 'test'],
@@ -53,7 +70,8 @@ async def invite_bot(context):
                 pass_context=True)
 async def warframe_list(context, *option):
     if option[0].lower() == 'a' or option[0].lower() == 'all':
-        warframeEmbed: object = wfMenu.genWarframeMenu(0)  # Generate the embed list (25 cap)
+        page_number = 0
+        warframeEmbed: object = query_wf.genWarframeMenu(page_number)  # Generate the embed list (25 cap) # (0 is page number)
         warframeList = await client.send_message(context.message.channel, embed=warframeEmbed)  # Send and store embed
         # Add reactions to interact with
         await client.add_reaction(warframeList, '1⃣')
@@ -70,66 +88,75 @@ async def warframe_list(context, *option):
         async def on_reaction_add(reaction, user):
             if user.name != client.user.name:
                 if reaction.emoji == '1⃣':
-                    updatedWfEmbed: object = wfMenu.genWarframeMenu(0)
+                    page_number = 0
+                    updatedWfEmbed: object = query_wf.genWarframeMenu(page_number)
                     await client.remove_reaction(warframeList, '1⃣', user)
                 elif reaction.emoji == '2⃣':
-                    updatedWfEmbed: object = wfMenu.genWarframeMenu(1)
+                    page_number = 1
+                    updatedWfEmbed: object = query_wf.genWarframeMenu(page_number)
                     await client.remove_reaction(warframeList, '2⃣', user)
                 elif reaction.emoji == '3⃣':
-                    updatedWfEmbed: object = wfMenu.genWarframeMenu(2)
+                    page_number = 2
+                    updatedWfEmbed: object = query_wf.genWarframeMenu(page_number)
                     await client.remove_reaction(warframeList, '3⃣', user)
                 elif reaction.emoji == '4⃣':
-                    updatedWfEmbed: object = wfMenu.genWarframeMenu(3)
+                    page_number = 3
+                    updatedWfEmbed: object = query_wf.genWarframeMenu(page_number)
                     await client.remove_reaction(warframeList, '4⃣', user)
                 if reaction.emoji != '❌':
                     await client.edit_message(warframeList, embed=updatedWfEmbed)
                 else:
                     await client.delete_message(warframeList)
 
-    if option[0].lower() != 'a' and option[0].lower() != 'all':  # Search database for specific warframe
+    else:  # Search database for specific warframe
         combinedOption = ''
         for word in option:
             combinedOption = combinedOption + " " + word.lower().capitalize()
-        lWarframeInfo = wfDatabase.getWarframeInfo(combinedOption.strip())  # Retrieve specific warframe from database
-        if len(lWarframeInfo) != 0:
-            previewEmbed: object = wfMenu.genPreview(lWarframeInfo[0], False)
+        lItemInfo = wfDatabase.getWarframeInfo(combinedOption.strip())  # Retrieve specific warframe from database
+        if len(lItemInfo) != 0:
+            previewEmbed: object = query_wf.genPreview(lItemInfo[0], False)
             previewEmbed.set_footer(text='(Version: pre pre pre alpha early access dlc edition preorder)')
             warframePreview = await client.send_message(context.message.channel,
                                                         embed=previewEmbed)  # Display warframe info
-            if lWarframeInfo[0][2] != 'N/A':  # Check for primed version
+            if lItemInfo[0][2] != 'N/A':  # Check for primed version
                 await client.add_reaction(warframePreview, '⬆')
                 await asyncio.sleep(0.6)
                 await client.add_reaction(warframePreview, '❌')
             else:
                 await client.add_reaction(warframePreview, '❌')
-
-            @client.event
-            async def on_reaction_add(reaction, user):
-                if user.name != client.user.name:
-                    await client.remove_reaction(warframePreview, '❌', client.user)
-                    if reaction.emoji == '⬆':
-                        await client.remove_reaction(warframePreview, '⬆', user)
-                        await client.remove_reaction(warframePreview, '⬆', client.user)
-                        lPrimeWarframeInfo = wfDatabase.getPrimeInfo(
-                            lWarframeInfo[0][2])  # Retrieve Prime info from database
-                        primePreviewEmbed: object = wfMenu.genPreview(lPrimeWarframeInfo[0], True)
-                        await client.edit_message(warframePreview, embed=primePreviewEmbed)  # Display prime stats
-                        await client.add_reaction(warframePreview, '⬇')
-                        await asyncio.sleep(0.6)
-                        await client.add_reaction(warframePreview, '❌')
-                    elif reaction.emoji == '⬇':
-                        await client.remove_reaction(warframePreview, '⬇', user)
-                        await client.remove_reaction(warframePreview, '⬇', client.user)
-                        regularPreviewEmbed: object = wfMenu.genPreview(lWarframeInfo[0], False)
-                        await client.edit_message(warframePreview, embed=regularPreviewEmbed)  # Display prime stats
-                        await client.add_reaction(warframePreview, '⬆')
-                        await asyncio.sleep(0.6)
-                        await client.add_reaction(warframePreview, '❌')
-                    elif reaction.emoji == '❌':
-                        await client.delete_message(warframePreview)  # Close embed
         else:  # QUERY ERROR!
-            errorEmbed: object = wfMenu.errorMessage()
-            await client.send_message(context.message.channel, embed=errorEmbed)
+            lItemInfo = wfDatabase.getWeaponInfo(combinedOption.strip())[0]
+            gunEmbed: object = query_weap.gen_gun_embed(lItemInfo)
+            gunPreview = await client.send_message(context.message.channel,
+                                                        embed=gunEmbed)  # Display warframe info
+            if len(lItemInfo) == 0:
+                errorEmbed: object = errorMessage()
+                await client.send_message(context.message.channel, embed=errorEmbed)
+
+        @client.event
+        async def on_reaction_add(reaction, user):
+            if user.name != client.user.name:
+                await client.remove_reaction(warframePreview, '❌', client.user)
+                if reaction.emoji == '⬆':
+                    await client.remove_reaction(warframePreview, '⬆', user)
+                    await client.remove_reaction(warframePreview, '⬆', client.user)
+                    lPrimeItemInfo = wfDatabase.getPrimeInfo(
+                        lItemInfo[0][2])  # Retrieve Prime info from database
+                    primePreviewEmbed: object = query_wf.genPreview(lPrimeItemInfo[0], True)
+                    await client.edit_message(warframePreview, embed=primePreviewEmbed)  # Display prime stats
+                    await client.add_reaction(warframePreview, '⬇')
+                    await asyncio.sleep(0.6)
+                    await client.add_reaction(warframePreview, '❌')
+                elif reaction.emoji == '⬇':
+                    await client.remove_reaction(warframePreview, '⬇', user)
+                    await client.remove_reaction(warframePreview, '⬇', client.user)
+                    regularPreviewEmbed: object = query_wf.genPreview(lItemInfo[0], False)
+                    await client.edit_message(warframePreview, embed=regularPreviewEmbed)  # Display prime stats
+                    await client.add_reaction(warframePreview, '⬆')
+                    await asyncio.sleep(0.6)
+                    await client.add_reaction(warframePreview, '❌')
+                elif reaction.emoji == '❌':
+                    await client.delete_message(warframePreview)  # Close embed
 
 
 # Create the command decorator
@@ -140,7 +167,7 @@ async def warframe_list(context, *option):
                 pass_context=True)
 async def relic_list(context, *option):
     if len(option) == 0:
-        relicOptionsEmbed: object = wfMenu.genRelicCatEmbed()
+        relicOptionsEmbed: object = query_relic.genRelicCatEmbed()
         await client.send_message(context.message.channel, embed=relicOptionsEmbed)
     else:
         if option[0].lower() == 'a' or option[0].lower() == 'all':
@@ -161,16 +188,16 @@ async def relic_list(context, *option):
             if searchQuery.strip() != "Forma":  # Search database for prime item
                 primeDetails: object = wfDatabase.searchItem(searchQuery.strip())
                 if len(primeDetails) != 0:
-                    primeDetailsEmbed = wfMenu.genPrimeDetEmbed(primeDetails)
+                    primeDetailsEmbed = query_relic.genPrimeDetEmbed(primeDetails)
                     await client.send_message(context.message.channel, embed=primeDetailsEmbed)
                 else:
                     relicTier = option[0].lower().capitalize()
                     relicName = option[1].capitalize()
-                    relicDropsEmbed = wfMenu.retrieveDropsInOrder(relicTier, relicName)
+                    relicDropsEmbed = query_relic.retrieveDropsInOrder(relicTier, relicName)
                     await client.send_message(context.message.channel, embed=relicDropsEmbed)
-                    # if len() == 0:
-                    #     errorEmbed = wfMenu.errorMessage()
-                    #     await client.send_message(context.message.channel, embed=errorEmbed)
+                    if len() == 0:
+                        errorEmbed = errorMessage()
+                        await client.send_message(context.message.channel, embed=errorEmbed)
             else:  # Forma searched
                 formaEmbed = discord.Embed(
                     title="Forma",
@@ -190,7 +217,7 @@ async def relic_list(context, *option):
                 brief="Displays recent patch notes",
                 pass_context=True)
 async def patchnotes(context):
-    patchEmbed = wfMenu.getHotfixes()
+    patchEmbed = query_html.getHotfixes()
     await client.send_message(context.message.channel, embed=patchEmbed)
 
 
@@ -204,7 +231,6 @@ async def on_ready():
     # Create the database and tables
     wfDatabase.create_Database()
     wfDatabase.createTables()
-    wfMenu.getHotfixes()
     # lHitOrMiss = ["Hit or miss, I guess", "they never miss, huh?", "You got a boyfriend,",
     #               "I bet he doesn't kiss ya", "He gon' find another girl", "and he won't miss ya",
     #               "He gon' skrrt and", "hit the dab like Wiz Khalifa", "You play with them balls",
@@ -240,4 +266,4 @@ async def on_message(message):
     await client.process_commands(message)
 
 client.loop.create_task(list_servers())
-client.run(os.getenv("TOKEN"))
+client.run(TOKEN)

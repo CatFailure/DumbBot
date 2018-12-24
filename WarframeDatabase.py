@@ -58,6 +58,39 @@ def createTables():
                 image_      TEXT    NOT NULL
             );''')
 
+    conn.execute('''CREATE TABLE IF NOT EXISTS tblWeapons
+               (
+                  weap_name_                TEXT        PRIMARY KEY,
+                  weap_trigger_type_        TEXT        NOT NULL,
+                  weap_dmg_                 TEXT        NOT NULL,
+                  weap_crit_chance_         TEXT        NOT NULL,
+                  weap_crit_mult_           TEXT        NOT NULL,
+                  weap_stat_chance_         TEXT        NOT NULL,
+                  weap_projectile_type_     TEXT        NOT NULL,
+                  weap_firerate_            INTEGER     NOT NULL,
+                  weap_magsize_             INTEGER     NOT NULL,
+                  weap_reload_              INTEGER     NOT NULL,
+                  weap_mastery_             INTEGER     NOT NULL,
+                  weap_disposition_         TEXT        NOT NULL,
+                  weap_image_               TEXT        NOT NULL
+                );''')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS tblMelee
+                   (
+                      melee_name_               TEXT        PRIMARY KEY,
+                      melee_type_               TEXT        NOT NULL,
+                      melee_normal_             TEXT        NOT NULL,
+                      melee_slide_              TEXT        NOT NULL,
+                      melee_attack_speed_       INTEGER     NOT NULL,
+                      melee_crit_chance_        TEXT        NOT NULL,
+                      melee_crit_damage_        TEXT        NOT NULL,
+                      melee_stat_chance_        TEXT        NOT NULL,
+                      melee_mastery_            INTEGER     NOT NULL,
+                      melee_stance_             TEXT        NOT NULL,
+                      melee_disposition_        TEXT        NOT NULL,
+                      melee_image_              TEXT        NOT NULL
+                    );''')
+    conn.commit()
 
 def getAllWarframes():
     conn = sqlite3.connect('dbWarframe.db')
@@ -86,12 +119,14 @@ def getPrimeInfo(warframeName):
     lPrimeWarframeInfo = list(cWarframeInfo)
     return lPrimeWarframeInfo
 
+
 def searchItem(item):
     conn = sqlite3.connect('dbWarframe.db')
     cPrimeInfo = conn.execute("SELECT DISTINCT item_, part_ FROM Prime_relics \
                                  WHERE item_ = ?", (item,))
     lPrimeInfo = list(cPrimeInfo)
     return lPrimeInfo
+
 
 def getRelicByPart(item, part):
     conn = sqlite3.connect('dbWarframe.db')
@@ -108,6 +143,7 @@ def getPartByRelicAndRarity(tier, name, rarity):
     lRelicDrops = list(cRelicDrops)
     return lRelicDrops
 
+
 def checkIfVaulted(item):
     conn = sqlite3.connect('dbWarframe.db')
     cVauledCheck = conn.execute("SELECT DISTINCT vaulted_ FROM Prime_relics \
@@ -115,9 +151,28 @@ def checkIfVaulted(item):
     lVaultedCheck = list(cVauledCheck)
     return lVaultedCheck
 
+
 def insertBlank():
     conn = sqlite3.connect('dbWarframe.db')
     for i in range(917):
         conn.execute("INSERT INTO Prime_relics\
         VALUES(0,0,0,0,0,0,0)")
     conn.commit()
+
+
+def getWeaponInfo(itemName):
+    conn = sqlite3.connect('dbWarframe.db')
+    cWeaponInfo = conn.execute("SELECT weap_name_, weap_trigger_type_, weap_dmg_, weap_crit_chance_, \
+    weap_crit_mult_, weap_stat_chance_, weap_projectile_type_, weap_firerate_, weap_magsize_, \
+    weap_reload_, weap_mastery_, weap_disposition_, weap_image_ FROM tblWeapons WHERE weap_name_ = ?", (itemName,))
+    lWeaponInfo = list(cWeaponInfo)
+    return lWeaponInfo
+
+
+def getMeleeInfo(itemName):
+    conn = sqlite3.connect('dbWarframe.db')
+    cMeleeInfo = conn.execute("SELECT melee_name_, melee_normal_, melee_slide_, melee_attack_speed_, \
+            melee_crit_chance_, melee_crit_damage_, melee_stat_chance_, melee_mastery_, melee_stance_, \
+            melee_disposition, melee_image_ FROM tblMelee WHERE melee_name_ = ?", (itemName,))
+    lMeleeInfo = list(cMeleeInfo)
+    return lMeleeInfo
