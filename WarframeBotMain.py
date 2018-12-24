@@ -1,6 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
-import os
 from discord.ext.commands import Bot
 import asyncio
 import WarframeDatabase as wfDatabase
@@ -10,7 +9,8 @@ import querying_html as query_html
 import querying_weapons as query_weap
 
 # Bot token
-TOKEN = os.environ["BOT_TOKEN"]
+TOKEN = "NDc2MTMwMzc2ODQzMTMyOTQ5.Dus8Gg.NWW1YN279fFIbfk__TT6UOxHzEM"
+
 # Define a prefix
 BOT_Prefix = "="
 
@@ -195,7 +195,7 @@ async def relic_list(context, *option):
                     relicName = option[1].capitalize()
                     relicDropsEmbed = query_relic.retrieveDropsInOrder(relicTier, relicName)
                     await client.send_message(context.message.channel, embed=relicDropsEmbed)
-                    if len() == 0:
+                    if len(relicDropsEmbed) == 0:
                         errorEmbed = errorMessage()
                         await client.send_message(context.message.channel, embed=errorEmbed)
             else:  # Forma searched
