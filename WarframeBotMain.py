@@ -1,6 +1,7 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
 from discord.ext.commands import Bot
+import os
 import asyncio
 import WarframeDatabase as wfDatabase
 import querying_warframes as query_wf
