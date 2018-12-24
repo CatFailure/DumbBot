@@ -1,5 +1,6 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
+import os
 from discord.ext.commands import Bot
 import asyncio
 import WarframeDatabase as wfDatabase
@@ -9,7 +10,7 @@ import querying_html as query_html
 import querying_weapons as query_weap
 
 # Bot token
-TOKEN = process.env.BOT_TOKEN
+TOKEN = os.environ["BOT_TOKEN"]
 # Define a prefix
 BOT_Prefix = "="
 
