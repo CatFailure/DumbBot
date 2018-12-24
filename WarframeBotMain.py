@@ -9,7 +9,7 @@ import querying_html as query_html
 import querying_weapons as query_weap
 
 # Bot token
-TOKEN = "NDc2MTMwMzc2ODQzMTMyOTQ5.Dus8Gg.NWW1YN279fFIbfk__TT6UOxHzEM"
+TOKEN = os.environ["BOT_TOKEN"]
 
 # Define a prefix
 BOT_Prefix = "="
