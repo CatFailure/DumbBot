@@ -10,7 +10,10 @@ import querying_html as query_html
 import querying_weapons as query_weap
 
 # Bot token
-TOKEN = os.environ["BOT_TOKEN"]
+TOKEN = "NDc2MTMwMzc2ODQzMTMyOTQ5.Dus8Gg.NWW1YN279fFIbfk__TT6UOxHzEM"
+
+# Bot token Github
+# TOKEN = os.environ["BOT_TOKEN"]
 
 # Define a prefix
 BOT_Prefix = "="
@@ -74,7 +77,7 @@ async def warframe_list(context, *option):
         page_number = 0
         warframeEmbed: object = query_wf.genWarframeMenu(page_number)  # Generate the embed list (25 cap) # (0 is page number)
         warframeList = await client.send_message(context.message.channel, embed=warframeEmbed)  # Send and store embed
-        # Add reactions to interact with
+        # Add reactions to interact with (DELET THIS)
         await client.add_reaction(warframeList, '1⃣')
         await asyncio.sleep(0.6)
         await client.add_reaction(warframeList, '2⃣')
@@ -193,11 +196,12 @@ async def relic_list(context, *option):
                     await client.send_message(context.message.channel, embed=primeDetailsEmbed)
                 else:
                     relicTier = option[0].lower().capitalize()
-                    relicName = option[1].capitalize()
-                    relicDropsEmbed = query_relic.retrieveDropsInOrder(relicTier, relicName)
-                    await client.send_message(context.message.channel, embed=relicDropsEmbed)
-                    if len(relicDropsEmbed) == 0:
-                        errorEmbed = errorMessage()
+                    if len(option) == 2:  # Ensure user uses command correctly
+                        relicName = option[1].capitalize()
+                        relicDropsEmbed = query_relic.retrieveDropsInOrder(relicTier, relicName)
+                        await client.send_message(context.message.channel, embed=relicDropsEmbed)
+                    else:
+                        errorEmbed: object = errorMessage()
                         await client.send_message(context.message.channel, embed=errorEmbed)
             else:  # Forma searched
                 formaEmbed = discord.Embed(
