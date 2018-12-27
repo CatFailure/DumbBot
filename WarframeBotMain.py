@@ -61,6 +61,21 @@ async def invite_bot(context):
                           inline=False)
     inviteEmbed.set_thumbnail(url='https://bit.ly/2RlTq6p')  # Display server logo ;)
     await client.send_message(context.message.channel, embed=inviteEmbed)
+    
+# Create the command decorator
+# WHY DO YOU CARE COMMAND
+@client.command(name='Why do you care?',
+                aliases=['wdyc', 'why do you care'],
+                description="Why do you care?",
+                brief="Why do you care?",
+                pass_context=True)
+async def why_do_you_care(context):
+    wdycEmbed = discord.Embed(
+        title="** **",
+        colour=discord.Colour.magenta()
+    )
+    wdycEmbed.set_thumbnail(url='https://cdn.discordapp.com/attachments/448538708187152399/527977651089047562/image0.jpg')  # Display server logo ;)
+    await client.send_message(context.message.channel, embed=wdycEmbed)
 
 
 # Create the command decorator
