@@ -87,7 +87,7 @@ async def warframe_list(context, *option):
 
         @client.event
         async def on_reaction_add(reaction, user):
-            if user.name != client.user.name:
+            if (user.name != client.user.name) and (user.name == context.message.author.name):
                 if reaction.emoji == '1⃣':
                     page_number = 0
                     updatedWfEmbed: object = query_wf.genWarframeMenu(page_number)
@@ -136,7 +136,7 @@ async def warframe_list(context, *option):
 
         @client.event
         async def on_reaction_add(reaction, user):
-            if user.name != client.user.name:
+            if (user.name != client.user.name) and (user.name == context.message.author.name):
                 await client.remove_reaction(warframePreview, '❌', client.user)
                 if reaction.emoji == '⬆':
                     await client.remove_reaction(warframePreview, '⬆', user)
@@ -207,7 +207,8 @@ async def relic_list(context, *option):
                     color=discord.Colour.gold()
                 )
                 formaEmbed.add_field(name="All forma drop locations (100+) can be found here:",
-                                     value="https://warframe.fandom.com/wiki/Forma")
+                                     value="https://warframe.fandom.com/wiki/Forma",
+                                     inline=False)
                 formaEmbed.set_thumbnail(url="http://bit.ly/FormaPicture")
                 await client.send_message(context.message.channel, embed=formaEmbed)
 
